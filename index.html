@@ -1,11 +1,67 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <title>ProfitWerx Tools</title>
-  <meta charset="utf-8">
+  <meta charset="UTF-8" />
+  <title>Monthly Bookkeeping Cost Estimator</title>
+  <meta name="description" content="Estimate the monthly cost of professional bookkeeping for your small business." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <h1>Tools by ProfitWerx</h1>
-  <p>Calculator coming soon.</p>
+
+  <main class="container">
+    <h1>Monthly Bookkeeping Cost Estimator</h1>
+    <p class="intro">
+      This tool provides a general estimate of ongoing monthly bookkeeping costs for small businesses.
+    </p>
+
+    <form id="calculator">
+
+      <label>
+        Monthly transaction volume
+        <select id="transactions">
+          <option value="0">Under 50</option>
+          <option value="50">50–100</option>
+          <option value="100">100–200</option>
+          <option value="200">200–400</option>
+          <option value="300">400+</option>
+        </select>
+      </label>
+
+      <label>
+        Number of bank & credit card accounts
+        <input type="number" id="accounts" value="2" min="1" />
+      </label>
+
+      <label>
+        Payroll
+        <select id="payroll">
+          <option value="0">No payroll</option>
+          <option value="75">1–5 employees</option>
+          <option value="150">6–15 employees</option>
+        </select>
+      </label>
+
+    </form>
+
+    <div class="result">
+      <h2>Estimated Monthly Cost</h2>
+      <p id="estimate">$—</p>
+      <p class="note">
+        This estimate covers ongoing monthly bookkeeping. Cleanup or catch-up work may be priced separately.
+      </p>
+    </div>
+
+    <footer>
+      <p class="brand">
+        This estimator is provided as a general planning tool by
+        <a href="https://www.profitwerx.com/oregon/bookkeeping-service">ProfitWerx</a>,
+        a bookkeeping and accounting firm supporting small businesses.
+      </p>
+    </footer>
+
+  </main>
+
+  <script src="calculator.js"></script>
 </body>
 </html>
