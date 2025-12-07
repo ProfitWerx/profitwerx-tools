@@ -353,7 +353,20 @@
             </label>
           </div>
         </div>
-
+<div class="field" id="months-behind-field" style="display: none;">
+  <div class="field-label">
+    <label for="months-behind">How many months behind?</label>
+    <span class="help">Round up to the nearest month</span>
+  </div>
+  <input
+    id="months-behind"
+    type="number"
+    min="1"
+    max="36"
+    value="6"
+    inputmode="numeric"
+  />
+</div>
         <div class="field">
           <div class="field-label">
             <span>How are you handling bookkeeping today?</span>
@@ -381,23 +394,24 @@
         </div>
 
         <div class="estimate-breakdown">
-          <dl>
-            <dt>Base service level</dt>
-            <dd id="base-amount">$200</dd>
+  <dl>
+    <dt>Base service level</dt>
+    <dd id="base-amount">$200</dd>
 
-            <dt>Transaction volume</dt>
-            <dd id="tx-amount">$175</dd>
+    <dt>Transaction volume</dt>
+    <dd id="tx-amount">$175</dd>
 
-            <dt>Bank / credit card accounts</dt>
-            <dd id="accounts-amount">$0</dd>
+    <dt>Payroll handling</dt>
+    <dd id="payroll-amount">$40</dd>
 
-            <dt>Payroll handling</dt>
-            <dd id="payroll-amount">$40</dd>
+    <dt>Estimated ongoing monthly total</dt>
+    <dd id="monthly-total">$415 – $515</dd>
 
-            <dt>Catch-up / cleanup (if needed)</dt>
-            <dd id="cleanup-amount">$0</dd>
-          </dl>
-        </div>
+    <dt>One-time cleanup project (if behind)</dt>
+    <dd id="cleanup-amount">—</dd>
+  </dl>
+</div>
+
 
         <p class="note">
           <strong>This tool is intentionally conservative.</strong>
