@@ -1,1 +1,60 @@
+body {
+  font-family: system-ui, sans-serif;
+  background: #f7f8fa;
+  margin: 0;
+  padding: 2rem;
+  color: #222;
+}
+
+.container {
+  max-width: 640px;
+  margin: auto;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+}
+
+h1 {
+  margin-top: 0;
+}
+
+label {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.result {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #ddd;
+}
+
+#estimate {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.note {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.brand {
+  margin-top: 2rem;
+  font-size: 0.85rem;
+  color: #555;
+}
 
