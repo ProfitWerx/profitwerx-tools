@@ -37,9 +37,8 @@
 
     // ---- PAYROLL ----
     let payrollAmount = 0;
-
-if (employees > 0) {
-  payrollAmount =
+    if (employees > 0) {
+    payrollAmount =
     PAYROLL_BASE_FEE + employees * PAYROLL_PER_EMPLOYEE;
 }
 
