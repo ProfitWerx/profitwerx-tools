@@ -449,7 +449,7 @@
       // --- Monthly pricing logic ---
       const baseAmount = 200; // base ongoing support
 
-      // Accounts complexity: small bump per active account, with a cap
+      // Account Reconciliations: small bump per active account, with a cap
       let accountAmount = bankAccounts * 15 + cardAccounts * 10;
       if (accountAmount > 250) accountAmount = 250;
 
