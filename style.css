@@ -58,6 +58,6 @@ select {
   color: #555;
 }
 
-#cleanup-box {
-  padding-bottom: 16px; /* or 20–24px if you want more air */
+#cleanup-text {
+  margin-bottom: 16px;
 }
