@@ -15,7 +15,8 @@
 
     // ---- CONFIGURABLE PRICING CONSTANTS ----
     const BASE_AMOUNT = 200; // base monthly support
-    const PAYROLL_PER_EMPLOYEE = 20; // $ per employee per month
+    const PAYROLL_BASE_FEE = 50;     // flat monthly payroll oversight
+    const PAYROLL_PER_EMPLOYEE = 10; // per employee per month
 
     // Transaction pricing bands (by selectedIndex, not option value)
     const TX_PRICING = [
@@ -35,9 +36,12 @@
     const txAmount = TX_PRICING[txBandIndex] || 0;
 
     // ---- PAYROLL ----
-    const employeesRaw = Number(employeesInput?.value || 0);
-    const employees = Math.max(0, Math.min(250, employeesRaw));
-    const payrollAmount = employees * PAYROLL_PER_EMPLOYEE;
+    let payrollAmount = 0;
+
+if (employees > 0) {
+  payrollAmount =
+    PAYROLL_BASE_FEE + employees * PAYROLL_PER_EMPLOYEE;
+}
 
     // ---- CLEANUP TOGGLE + MONTHS BEHIND ----
     let cleanupValue = "no";
