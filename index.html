@@ -454,8 +454,12 @@
       if (accountAmount > 250) accountAmount = 250;
 
       // Payroll handling: simple per-head estimate with a cap
-      let payrollAmount = employees * 20;
-      if (payrollAmount > 500) payrollAmount = 500;
+      let payrollAmount = 0;
+
+if (employees > 0) {
+  payrollAmount =
+    PAYROLL_BASE_FEE + employees * PAYROLL_PER_EMPLOYEE;
+}
 
       const monthlyLow = baseAmount + txAmount + accountAmount + payrollAmount;
       const monthlyHigh = monthlyLow + 150; // give a healthy but not crazy range
