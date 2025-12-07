@@ -1,142 +1,158 @@
-function formatCurrency(value) {
-  return "$" + value.toLocaleString("en-US", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  });
-}
+<script>
+  function formatCurrency(value) {
+    return "$" + value.toLocaleString("en-US", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
+  }
 
-function calculateEstimate() {
-  const txSelect = document.getElementById("transactions");
-  const employeesInput = document.getElementById("employees");
-  const cleanupRadios = document.querySelectorAll("input[name='cleanup']");
-  const currentMethod = document.getElementById("current-method").value;
-  const monthsBehindInput = document.getElementById("months-behind");
+  function calculateEstimate() {
+    const txSelect = document.getElementById("transactions");
+    const employeesInput = document.getElementById("employees");
+    const cleanupRadios = document.querySelectorAll("input[name='cleanup']");
+    const currentMethod = document.getElementById("current-method").value;
+    const monthsBehindInput = document.getElementById("months-behind");
 
-  // --- Core inputs ---
-  const txAmount = Number(txSelect.value) || 0;
+    // ---- CONFIGURABLE PRICING CONSTANTS ----
+    const BASE_AMOUNT = 200; // base monthly support
+    const PAYROLL_PER_EMPLOYEE = 20; // $ per employee per month
 
-  const employees = Math.max(
-    0,
-    Math.min(250, Number(employeesInput.value) || 0)
-  );
-  const payrollAmount = employees * 20; // $20 / employee per month as a rough guide
+    // Transaction pricing bands (by selectedIndex, not option value)
+    const TX_PRICING = [
+      150, // 0–50
+      225, // 51–150
+      325, // 151–300
+      450, // 301–600
+      600, // 600+
+    ];
 
-  let cleanupValue = "no";
-  cleanupRadios.forEach((r) => {
-    if (r.checked) cleanupValue = r.value;
-  });
+    // Cleanup multipliers (per month behind)
+    const CLEANUP_LOW_MULTIPLIER = 0.7;
+    const CLEANUP_HIGH_MULTIPLIER = 1.1;
 
-  // Months behind (for separate project estimate)
-  let monthsBehind = 0;
-  if (monthsBehindInput) {
-    monthsBehind = Math.max(
-      0,
-      Math.min(36, Number(monthsBehindInput.value) || 0)
+    // ---- TRANSACTION BAND ----
+    const txBandIndex = txSelect ? txSelect.selectedIndex : 0;
+    const txAmount = TX_PRICING[txBandIndex] || 0;
+
+    // ---- PAYROLL ----
+    const employeesRaw = Number(employeesInput?.value || 0);
+    const employees = Math.max(0, Math.min(250, employeesRaw));
+    const payrollAmount = employees * PAYROLL_PER_EMPLOYEE;
+
+    // ---- CLEANUP TOGGLE + MONTHS BEHIND ----
+    let cleanupValue = "no";
+    cleanupRadios.forEach((r) => {
+      if (r.checked) cleanupValue = r.value;
+    });
+
+    const wantsCleanup = cleanupValue === "yes";
+
+    let monthsBehind = 0;
+    if (monthsBehindInput) {
+      if (wantsCleanup) {
+        const rawMonths = Number(monthsBehindInput.value || 0);
+        monthsBehind = Math.max(0, Math.min(36, rawMonths));
+        monthsBehindInput.disabled = false;
+      } else {
+        monthsBehindInput.disabled = true;
+        monthsBehindInput.value = "0";
+      }
+    }
+
+    // ---- MONTHLY ESTIMATE ----
+    const lowMonthly = BASE_AMOUNT + txAmount + payrollAmount;
+    const highMonthly = Math.round(lowMonthly * 1.25); // 25% buffer
+
+    // ---- CLEANUP ESTIMATE (ONE-TIME) ----
+    let cleanupLow = 0;
+    let cleanupHigh = 0;
+    if (wantsCleanup && monthsBehind > 0) {
+      cleanupLow = Math.round(
+        lowMonthly * CLEANUP_LOW_MULTIPLIER * monthsBehind
+      );
+      cleanupHigh = Math.round(
+        highMonthly * CLEANUP_HIGH_MULTIPLIER * monthsBehind
+      );
+    }
+
+    // ---- UPDATE BREAKDOWN ----
+    document.getElementById("base-amount").textContent =
+      formatCurrency(BASE_AMOUNT);
+    document.getElementById("tx-amount").textContent =
+      formatCurrency(txAmount);
+    document.getElementById("payroll-amount").textContent =
+      payrollAmount > 0 ? formatCurrency(payrollAmount) : "$0";
+
+    const cleanupAmountEl = document.getElementById("cleanup-amount");
+    if (cleanupLow > 0 && cleanupHigh > 0) {
+      cleanupAmountEl.textContent =
+        "≈ " +
+        formatCurrency(cleanupLow) +
+        " – " +
+        formatCurrency(cleanupHigh) +
+        " (one-time)";
+    } else {
+      cleanupAmountEl.textContent = "$0";
+    }
+
+    // ---- UPDATE MAIN RANGE ----
+    document.getElementById("estimate-range").textContent =
+      formatCurrency(lowMonthly) + " – " + formatCurrency(highMonthly);
+
+    // ---- CAPTION LOGIC ----
+    const captionEl = document.getElementById("estimate-caption");
+    let caption = "Typical range for a small Oregon-based business.";
+
+    if (wantsCleanup && monthsBehind > 0) {
+      caption =
+        "Ongoing monthly range shown above. One-time catch-up estimate is based on about " +
+        monthsBehind +
+        (monthsBehind === 1 ? " month" : " months") +
+        " behind.";
+    } else if (currentMethod === "none") {
+      caption =
+        "Good starting point if your books haven’t really been maintained yet.";
+    } else if (currentMethod === "other-bookkeeper") {
+      caption =
+        "Useful if you’re comparing against your current bookkeeping setup.";
+    } else if (currentMethod === "self") {
+      caption =
+        "Approximate investment to move bookkeeping off your plate each month.";
+    }
+
+    captionEl.textContent = caption;
+  }
+
+  // ---- EVENT LISTENERS ----
+  document
+    .getElementById("transactions")
+    .addEventListener("change", calculateEstimate);
+
+  document
+    .getElementById("employees")
+    .addEventListener("input", calculateEstimate);
+
+  document
+    .querySelectorAll("input[name='cleanup']")
+    .forEach((el) =>
+      el.addEventListener("change", (e) => {
+        document
+          .querySelectorAll("#cleanup-toggle .pill-toggle")
+          .forEach((label) => label.classList.remove("active"));
+        e.target.closest(".pill-toggle").classList.add("active");
+        calculateEstimate();
+      })
     );
+
+  document
+    .getElementById("current-method")
+    .addEventListener("change", calculateEstimate);
+
+  const monthsBehindInputInit = document.getElementById("months-behind");
+  if (monthsBehindInputInit) {
+    monthsBehindInputInit.addEventListener("input", calculateEstimate);
   }
 
-  // --- Monthly pricing (ongoing support only) ---
-  const baseAmount = 200; // base monthly support – keep simple / conservative
-
-  // NOTE: cleanup / catch-up is now handled SEPARATELY (not baked into monthly)
-  const monthlyLow = baseAmount + txAmount + payrollAmount;
-  const monthlyHigh = monthlyLow + 100; // simple range buffer
-
-  // --- One-time cleanup project estimate ---
-  // Only apply if user says they are behind AND monthsBehind > 0
-  let cleanupText = "$0";
-  let cleanupLow = 0;
-  let cleanupHigh = 0;
-
-  if (cleanupValue === "yes" && monthsBehind > 0) {
-    // Per-month-behind ranges (tweakable)
-    const perMonthLow = 100;  // lower bound per month of cleanup
-    const perMonthHigh = 200; // upper bound per month of cleanup
-
-    cleanupLow = monthsBehind * perMonthLow;
-    cleanupHigh = monthsBehind * perMonthHigh;
-
-    cleanupText =
-      formatCurrency(cleanupLow) +
-      " – " +
-      formatCurrency(cleanupHigh) +
-      " one-time";
-  } else if (cleanupValue === "yes" && monthsBehind === 0) {
-    cleanupText = "TBD after review (no months specified)";
-  } else {
-    cleanupText = "$0 (no catch-up work)";
-  }
-
-  // --- Update breakdown numbers / text ---
-  document.getElementById("base-amount").textContent =
-    formatCurrency(baseAmount);
-  document.getElementById("tx-amount").textContent = formatCurrency(txAmount);
-  document.getElementById("payroll-amount").textContent =
-    payrollAmount > 0 ? formatCurrency(payrollAmount) : "$0";
-  document.getElementById("cleanup-amount").textContent = cleanupText;
-
-  // --- Update main monthly estimate ---
-  document.getElementById("estimate-range").textContent =
-    formatCurrency(monthlyLow) + " – " + formatCurrency(monthlyHigh);
-
-  // --- Caption logic (explainer text under the big number) ---
-  const captionEl = document.getElementById("estimate-caption");
-
-  let caption = "Typical range for a small Oregon-based business.";
-
-  if (cleanupValue === "yes" && monthsBehind > 0) {
-    caption =
-      `Monthly range above is for ongoing bookkeeping only. ` +
-      `Estimated one-time catch-up project: ${formatCurrency(
-        cleanupLow
-      )} – ${formatCurrency(cleanupHigh)} for roughly ${monthsBehind} month(s) behind.`;
-  } else if (cleanupValue === "yes" && monthsBehind === 0) {
-    caption =
-      "Monthly range above is for ongoing bookkeeping only. One-time catch-up work would be quoted after reviewing how far behind things are.";
-  } else if (currentMethod === "none") {
-    caption =
-      "Good starting point if your books haven’t really been maintained yet.";
-  } else if (currentMethod === "other-bookkeeper") {
-    caption =
-      "Useful if you’re comparing against your current bookkeeping setup.";
-  } else if (currentMethod === "self") {
-    caption =
-      "Approximate investment to move bookkeeping off your plate each month.";
-  }
-
-  captionEl.textContent = caption;
-}
-
-// Attach listeners
-document
-  .getElementById("transactions")
-  .addEventListener("change", calculateEstimate);
-
-document
-  .getElementById("employees")
-  .addEventListener("input", calculateEstimate);
-
-document
-  .querySelectorAll("input[name='cleanup']")
-  .forEach((el) =>
-    el.addEventListener("change", (e) => {
-      document
-        .querySelectorAll("#cleanup-toggle .pill-toggle")
-        .forEach((label) => label.classList.remove("active"));
-      e.target.closest(".pill-toggle").classList.add("active");
-      calculateEstimate();
-    })
-  );
-
-document
-  .getElementById("current-method")
-  .addEventListener("change", calculateEstimate);
-
-// Optional listener if the months-behind field exists
-const monthsBehindInput = document.getElementById("months-behind");
-if (monthsBehindInput) {
-  monthsBehindInput.addEventListener("input", calculateEstimate);
-}
-
-// Initial calc
-calculateEstimate();
+  // Initial calc on load
+  calculateEstimate();
+</script>
