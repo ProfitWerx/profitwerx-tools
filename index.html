@@ -292,12 +292,12 @@
       <!-- LEFT: INPUTS -->
       <section class="card" aria-label="Bookkeeping inputs">
         <h2>Your business details</h2>
-        <p>Adjust the sliders to match your current situation as closely as you can.</p>
+        <p>Adjust the inputs to match your current situation as closely as you can.</p>
 
         <div class="field">
           <div class="field-label">
             <label for="transactions">Monthly transactions</label>
-            <span class="help">Bank / credit card / other entries</span>
+            <span class="help">Total bank / credit card / other entries</span>
           </div>
           <select id="transactions">
             <option value="175">0 – 50 transactions / month</option>
@@ -305,6 +305,20 @@
             <option value="300">151 – 300 transactions / month</option>
             <option value="375">301 – 600 transactions / month</option>
             <option value="500">600+ transactions / month</option>
+          </select>
+        </div>
+
+        <!-- NEW: Bank / credit card accounts -->
+        <div class="field">
+          <div class="field-label">
+            <label for="accounts">Bank / credit card accounts to reconcile</label>
+            <span class="help">Checking, savings, credit cards, merchant accounts</span>
+          </div>
+          <select id="accounts">
+            <option value="0">1 account</option>
+            <option value="40">2 – 3 accounts</option>
+            <option value="80">4 – 5 accounts</option>
+            <option value="120">6+ accounts</option>
           </select>
         </div>
 
@@ -374,6 +388,9 @@
             <dt>Transaction volume</dt>
             <dd id="tx-amount">$175</dd>
 
+            <dt>Bank / credit card accounts</dt>
+            <dd id="accounts-amount">$0</dd>
+
             <dt>Payroll handling</dt>
             <dd id="payroll-amount">$40</dd>
 
@@ -392,7 +409,9 @@
         <p class="note">
           If you selected that you’re behind on your books, the estimate above
           reflects ongoing monthly support only. One-time catch-up projects are
-          typically quoted separately. Additionally services such as tax filings or special reporting may affect final pricing depending on business needs.        </p>
+          typically quoted separately. Additional services such as tax filings or
+          special reporting may affect final pricing depending on business needs.
+        </p>
 
         <div class="brand-footer">
           This calculator is provided by
@@ -414,11 +433,13 @@
 
     function calculateEstimate() {
       const txSelect = document.getElementById("transactions");
+      const accountsSelect = document.getElementById("accounts");
       const employeesInput = document.getElementById("employees");
       const cleanupRadios = document.querySelectorAll("input[name='cleanup']");
       const currentMethod = document.getElementById("current-method").value;
 
       const txAmount = Number(txSelect.value) || 0;
+      const accountsAmount = Number(accountsSelect.value) || 0;
 
       const employees = Math.max(
         0,
@@ -435,13 +456,15 @@
 
       const cleanupMonthly = cleanupValue === "yes" ? 75 : 0;
 
-      const low = baseAmount + txAmount + payrollAmount;
+      const low = baseAmount + txAmount + accountsAmount + payrollAmount;
       const high = low + 100 + (cleanupMonthly ? 50 : 0);
 
       document.getElementById("base-amount").textContent =
         formatCurrency(baseAmount);
       document.getElementById("tx-amount").textContent =
         formatCurrency(txAmount);
+      document.getElementById("accounts-amount").textContent =
+        accountsAmount > 0 ? formatCurrency(accountsAmount) : "$0";
       document.getElementById("payroll-amount").textContent =
         payrollAmount > 0 ? formatCurrency(payrollAmount) : "$0";
       document.getElementById("cleanup-amount").textContent =
@@ -476,17 +499,22 @@
       .getElementById("transactions")
       .addEventListener("change", calculateEstimate);
     document
+      .getElementById("accounts")
+      .addEventListener("change", calculateEstimate);
+    document
       .getElementById("employees")
       .addEventListener("input", calculateEstimate);
     document
       .querySelectorAll("input[name='cleanup']")
-      .forEach((el) => el.addEventListener("change", (e) => {
-        document
-          .querySelectorAll("#cleanup-toggle .pill-toggle")
-          .forEach((label) => label.classList.remove("active"));
-        e.target.closest(".pill-toggle").classList.add("active");
-        calculateEstimate();
-      }));
+      .forEach((el) =>
+        el.addEventListener("change", (e) => {
+          document
+            .querySelectorAll("#cleanup-toggle .pill-toggle")
+            .forEach((label) => label.classList.remove("active"));
+          e.target.closest(".pill-toggle").classList.add("active");
+          calculateEstimate();
+        })
+      );
     document
       .getElementById("current-method")
       .addEventListener("change", calculateEstimate);
