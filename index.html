@@ -92,3 +92,410 @@
     .card p {
       margin: 0 0 14px;
       font-size: 0.92rem;
+      color: var(--text-muted);
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field:last-child {
+      margin-bottom: 0;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 4px;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .field-label span.help {
+      font-size: 0.78rem;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    select,
+    input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      font-size: 0.95rem;
+      border-radius: 10px;
+      border: 1px solid var(--border-soft);
+      background: #f9fafb;
+      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+
+    select:focus,
+    input[type="number"]:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(22, 163, 74, 0.35);
+      background: white;
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+
+    .toggle-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .pill-toggle {
+      flex: 1;
+      text-align: center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      font-size: 0.86rem;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+
+    .pill-toggle.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: #14532d;
+      font-weight: 600;
+    }
+
+    .pill-toggle input {
+      display: none;
+    }
+
+    .result-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .estimate-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #14532d;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .estimate-main {
+      font-size: 1.7rem;
+      font-weight: 650;
+      letter-spacing: -0.05em;
+      margin-bottom: 4px;
+    }
+
+    .estimate-sub {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .estimate-breakdown {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 10px 12px;
+      border: 1px dashed rgba(148, 163, 184, 0.8);
+      font-size: 0.83rem;
+      margin-bottom: 10px;
+    }
+
+    .estimate-breakdown dl {
+      margin: 0;
+      display: grid;
+      grid-template-columns: 1.7fr 1fr;
+      row-gap: 4px;
+      column-gap: 10px;
+    }
+
+    .estimate-breakdown dt {
+      color: var(--text-muted);
+    }
+
+    .estimate-breakdown dd {
+      text-align: right;
+      margin: 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    .note strong {
+      color: #374151;
+    }
+
+    .brand-footer {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(209, 213, 219, 0.9);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .brand-footer a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 550;
+    }
+
+    .brand-footer a:hover {
+      text-decoration: underline;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.76rem;
+      color: #e5f4ff;
+      background: rgba(15, 118, 110, 0.35);
+      border: 1px solid rgba(34, 211, 238, 0.4);
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="heading">
+      <h1>Monthly Bookkeeping Cost Estimator</h1>
+      <p>
+        Get a quick, ballpark estimate of what ongoing bookkeeping support
+        could cost your small business in Oregon.
+      </p>
+      <div class="badge">
+        No sales tax included – Oregon doesn’t have one.
+      </div>
+    </header>
+
+    <section class="grid">
+      <!-- LEFT: INPUTS -->
+      <section class="card" aria-label="Bookkeeping inputs">
+        <h2>Your business details</h2>
+        <p>Adjust the sliders to match your current situation as closely as you can.</p>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="transactions">Monthly transactions</label>
+            <span class="help">Bank / credit card / other entries</span>
+          </div>
+          <select id="transactions">
+            <option value="175">0 – 50 transactions / month</option>
+            <option value="225">51 – 150 transactions / month</option>
+            <option value="300">151 – 300 transactions / month</option>
+            <option value="375">301 – 600 transactions / month</option>
+            <option value="500">600+ transactions / month</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="employees">Number of employees on payroll</label>
+            <span class="help">Include owners if they’re paid through payroll</span>
+          </div>
+          <input
+            id="employees"
+            type="number"
+            min="0"
+            max="250"
+            value="2"
+            inputmode="numeric"
+          />
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <span>Do you need catch-up / clean-up work?</span>
+            <span class="help">Past months that aren’t fully reconciled</span>
+          </div>
+          <div class="toggle-row" id="cleanup-toggle">
+            <label class="pill-toggle active">
+              <input type="radio" name="cleanup" value="no" checked />
+              No, I’m mostly current
+            </label>
+            <label class="pill-toggle">
+              <input type="radio" name="cleanup" value="yes" />
+              Yes, I’m behind
+            </label>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <span>How are you handling bookkeeping today?</span>
+          </div>
+          <select id="current-method">
+            <option value="self">I do it myself</option>
+            <option value="none">It’s not really being done</option>
+            <option value="other-bookkeeper">I have a bookkeeper now</option>
+            <option value="in-house">In-house staff handles it</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- RIGHT: RESULT -->
+      <section class="card" aria-label="Estimated cost">
+        <div class="result-header">
+          <h2>Estimated monthly investment</h2>
+          <span class="estimate-pill">Ballpark estimate – not a quote</span>
+        </div>
+
+        <div class="estimate-main" id="estimate-range">$375 – $475</div>
+        <div class="estimate-sub" id="estimate-caption">
+          Typical range for a small Oregon-based service business with light
+          payroll.
+        </div>
+
+        <div class="estimate-breakdown">
+          <dl>
+            <dt>Base service level</dt>
+            <dd id="base-amount">$200</dd>
+
+            <dt>Transaction volume</dt>
+            <dd id="tx-amount">$175</dd>
+
+            <dt>Payroll handling</dt>
+            <dd id="payroll-amount">$40</dd>
+
+            <dt>Catch-up / cleanup (if needed)</dt>
+            <dd id="cleanup-amount">$0</dd>
+          </dl>
+        </div>
+
+        <p class="note">
+          <strong>This tool is intentionally conservative.</strong>
+          It’s meant to give you a realistic range, not the lowest possible
+          number. Actual pricing depends on factors like industry, software
+          stack, reporting needs, and how organized your records are.
+        </p>
+
+        <p class="note">
+          If you selected that you’re behind on your books, the estimate above
+          reflects ongoing monthly support only. One-time catch-up projects are
+          typically quoted separately. Additionally services such as tax filings or special reporting may affect final pricing depending on business needs.        </p>
+
+        <div class="brand-footer">
+          This calculator is provided by
+          <a href="https://www.profitwerx.com/bookkeeping" target="_blank" rel="noopener">
+            ProfitWerx
+          </a>, a bookkeeping and accounting partner for small businesses in Oregon.
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    function formatCurrency(value) {
+      return "$" + value.toLocaleString("en-US", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      });
+    }
+
+    function calculateEstimate() {
+      const txSelect = document.getElementById("transactions");
+      const employeesInput = document.getElementById("employees");
+      const cleanupRadios = document.querySelectorAll("input[name='cleanup']");
+      const currentMethod = document.getElementById("current-method").value;
+
+      const txAmount = Number(txSelect.value) || 0;
+
+      const employees = Math.max(
+        0,
+        Math.min(250, Number(employeesInput.value) || 0)
+      );
+      const payrollAmount = employees * 20; // $20 / employee per month as a rough guide
+
+      let cleanupValue = "no";
+      cleanupRadios.forEach((r) => {
+        if (r.checked) cleanupValue = r.value;
+      });
+
+      const baseAmount = 200; // base monthly support
+
+      const cleanupMonthly = cleanupValue === "yes" ? 75 : 0;
+
+      const low = baseAmount + txAmount + payrollAmount;
+      const high = low + 100 + (cleanupMonthly ? 50 : 0);
+
+      document.getElementById("base-amount").textContent =
+        formatCurrency(baseAmount);
+      document.getElementById("tx-amount").textContent =
+        formatCurrency(txAmount);
+      document.getElementById("payroll-amount").textContent =
+        payrollAmount > 0 ? formatCurrency(payrollAmount) : "$0";
+      document.getElementById("cleanup-amount").textContent =
+        cleanupMonthly > 0 ? "~" + formatCurrency(cleanupMonthly) : "$0";
+
+      document.getElementById("estimate-range").textContent =
+        formatCurrency(low) + " – " + formatCurrency(high);
+
+      const captionEl = document.getElementById("estimate-caption");
+
+      let caption = "Typical range for a small Oregon-based business.";
+
+      if (cleanupValue === "yes") {
+        caption =
+          "Ongoing monthly range. One-time catch-up work is usually quoted separately.";
+      } else if (currentMethod === "none") {
+        caption =
+          "Good starting point if your books haven’t really been maintained yet.";
+      } else if (currentMethod === "other-bookkeeper") {
+        caption =
+          "Useful if you’re comparing against your current bookkeeping setup.";
+      } else if (currentMethod === "self") {
+        caption =
+          "Approximate investment to move bookkeeping off your plate each month.";
+      }
+
+      captionEl.textContent = caption;
+    }
+
+    // Attach listeners
+    document
+      .getElementById("transactions")
+      .addEventListener("change", calculateEstimate);
+    document
+      .getElementById("employees")
+      .addEventListener("input", calculateEstimate);
+    document
+      .querySelectorAll("input[name='cleanup']")
+      .forEach((el) => el.addEventListener("change", (e) => {
+        document
+          .querySelectorAll("#cleanup-toggle .pill-toggle")
+          .forEach((label) => label.classList.remove("active"));
+        e.target.closest(".pill-toggle").classList.add("active");
+        calculateEstimate();
+      }));
+    document
+      .getElementById("current-method")
+      .addEventListener("change", calculateEstimate);
+
+    // Initial calc
+    calculateEstimate();
+  </script>
+</body>
+</html>
