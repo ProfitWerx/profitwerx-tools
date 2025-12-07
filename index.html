@@ -79,10 +79,6 @@
       border: 1px solid rgba(148, 163, 184, 0.18);
     }
 
-    .card + .card {
-      border-left: none;
-    }
-
     .card h2 {
       margin: 0 0 12px;
       font-size: 1.1rem;
@@ -144,35 +140,6 @@
     }
     input[type="number"] {
       -moz-appearance: textfield;
-    }
-
-    .toggle-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 6px;
-    }
-
-    .pill-toggle {
-      flex: 1;
-      text-align: center;
-      padding: 7px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border-soft);
-      font-size: 0.86rem;
-      cursor: pointer;
-      user-select: none;
-      transition: background 0.15s, border-color 0.15s, color 0.15s;
-    }
-
-    .pill-toggle.active {
-      background: var(--accent-soft);
-      border-color: var(--accent);
-      color: #14532d;
-      font-weight: 600;
-    }
-
-    .pill-toggle input {
-      display: none;
     }
 
     .result-header {
@@ -264,17 +231,18 @@
       text-decoration: underline;
     }
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      border-radius: 999px;
-      padding: 4px 10px;
-      font-size: 0.76rem;
-      color: #e5f4ff;
-      background: rgba(15, 118, 110, 0.35);
-      border: 1px solid rgba(34, 211, 238, 0.4);
-      margin-top: 8px;
+    .cleanup-box {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #fefce8;
+      border: 1px solid #facc15;
+      font-size: 0.83rem;
+    }
+
+    .cleanup-title {
+      font-weight: 600;
+      margin-bottom: 4px;
     }
   </style>
 </head>
@@ -283,8 +251,7 @@
     <header class="heading">
       <h1>Monthly Bookkeeping Cost Estimator</h1>
       <p>
-        Get a quick, ballpark estimate of what ongoing bookkeeping support
-        could cost your small business in Oregon.
+        Get a ballpark estimate of ongoing bookkeeping support for your small business in Oregon.
       </p>
     </header>
 
@@ -292,34 +259,50 @@
       <!-- LEFT: INPUTS -->
       <section class="card" aria-label="Bookkeeping inputs">
         <h2>Your business details</h2>
-        <p>Adjust the inputs to match your current situation as closely as you can.</p>
+        <p>Adjust the fields to match your current situation as closely as you can.</p>
 
         <div class="field">
           <div class="field-label">
-            <label for="transactions">Monthly transactions</label>
+            <label for="transactions">Monthly transaction volume</label>
             <span class="help">Total bank / credit card / other entries</span>
           </div>
           <select id="transactions">
-            <option value="175">0 – 50 transactions / month</option>
-            <option value="225">51 – 150 transactions / month</option>
-            <option value="300">151 – 300 transactions / month</option>
-            <option value="375">301 – 600 transactions / month</option>
-            <option value="500">600+ transactions / month</option>
+            <option value="100">0 – 50 transactions / month</option>
+            <option value="175">51 – 150 transactions / month</option>
+            <option value="250">151 – 300 transactions / month</option>
+            <option value="350">301 – 600 transactions / month</option>
+            <option value="450">600+ transactions / month</option>
           </select>
         </div>
 
-        <!-- NEW: Bank / credit card accounts -->
         <div class="field">
           <div class="field-label">
-            <label for="accounts">Bank / credit card accounts to reconcile</label>
-            <span class="help">Checking, savings, credit cards, merchant accounts</span>
+            <label for="bank-accounts">Active bank accounts</label>
+            <span class="help">Checking / savings accounts you reconcile</span>
           </div>
-          <select id="accounts">
-            <option value="0">1 account</option>
-            <option value="40">2 – 3 accounts</option>
-            <option value="80">4 – 5 accounts</option>
-            <option value="120">6+ accounts</option>
-          </select>
+          <input
+            id="bank-accounts"
+            type="number"
+            min="0"
+            max="20"
+            value="2"
+            inputmode="numeric"
+          />
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="card-accounts">Active credit card accounts</label>
+            <span class="help">Business cards you use regularly</span>
+          </div>
+          <input
+            id="card-accounts"
+            type="number"
+            min="0"
+            max="30"
+            value="2"
+            inputmode="numeric"
+          />
         </div>
 
         <div class="field">
@@ -339,34 +322,19 @@
 
         <div class="field">
           <div class="field-label">
-            <span>Do you need catch-up / clean-up work?</span>
-            <span class="help">Past months that aren’t fully reconciled</span>
+            <label for="months-behind">Months behind on bookkeeping</label>
+            <span class="help">0 if you’re fully current</span>
           </div>
-          <div class="toggle-row" id="cleanup-toggle">
-            <label class="pill-toggle active">
-              <input type="radio" name="cleanup" value="no" checked />
-              No, I’m mostly current
-            </label>
-            <label class="pill-toggle">
-              <input type="radio" name="cleanup" value="yes" />
-              Yes, I’m behind
-            </label>
-          </div>
+          <input
+            id="months-behind"
+            type="number"
+            min="0"
+            max="36"
+            value="0"
+            inputmode="numeric"
+          />
         </div>
-<div class="field" id="months-behind-wrapper">
-  <div class="field-label">
-    <label for="months-behind">How many months behind are your books?</label>
-    <span class="help">Only if you selected that you’re behind</span>
-  </div>
-  <input
-    id="months-behind"
-    type="number"
-    min="0"
-    max="36"
-    value="0"
-    inputmode="numeric"
-  />
-</div>
+
         <div class="field">
           <div class="field-label">
             <span>How are you handling bookkeeping today?</span>
@@ -389,42 +357,43 @@
 
         <div class="estimate-main" id="estimate-range">$375 – $475</div>
         <div class="estimate-sub" id="estimate-caption">
-          Typical range for a small Oregon-based service business with light
-          payroll.
+          Typical range for a small Oregon-based service business with light payroll.
         </div>
 
         <div class="estimate-breakdown">
-  <dl>
-    <dt>Base service level</dt>
-    <dd id="base-amount">$200</dd>
+          <dl>
+            <dt>Base service level</dt>
+            <dd id="base-amount">$200</dd>
 
-    <dt>Transaction volume</dt>
-    <dd id="tx-amount">$175</dd>
+            <dt>Transaction volume</dt>
+            <dd id="tx-amount">$175</dd>
 
-    <dt>Payroll handling</dt>
-    <dd id="payroll-amount">$40</dd>
+            <dt>Accounts complexity (bank & cards)</dt>
+            <dd id="account-amount">$60</dd>
 
-    <dt>Estimated ongoing monthly total</dt>
-    <dd id="monthly-total">$415 – $515</dd>
+            <dt>Payroll handling</dt>
+            <dd id="payroll-amount">$40</dd>
+          </dl>
+        </div>
 
-    <dt>One-time cleanup project (if behind)</dt>
-    <dd id="cleanup-amount">—</dd>
-  </dl>
-</div>
-
+        <div class="cleanup-box" id="cleanup-box">
+          <div class="cleanup-title">Estimated one-time catch-up project</div>
+          <div id="cleanup-text">
+            You’re current on your books, so no separate cleanup project is assumed.
+          </div>
+        </div>
 
         <p class="note">
           <strong>This tool is intentionally conservative.</strong>
-          It’s meant to give you a realistic range, not the lowest possible
-          number. Actual pricing depends on factors like industry, software
-          stack, reporting needs, and how organized your records are.
+          It’s meant to give you a realistic Oregon-based range, not the lowest possible
+          number. Actual pricing depends on industry, software stack, reporting needs,
+          and how organized your records are.
         </p>
 
         <p class="note">
-          If you selected that you’re behind on your books, the estimate above
-          reflects ongoing monthly support only. One-time catch-up projects are
-          typically quoted separately. Additional services such as tax filings or
-          special reporting may affect final pricing depending on business needs.
+          Cleanup estimates above are rough ranges based on the number of months you’re
+          behind and your typical monthly complexity. Formal proposals would spell out
+          scope, deliverables, and exact pricing.
         </p>
 
         <div class="brand-footer">
@@ -438,6 +407,12 @@
   </main>
 
   <script>
+    function clamp(value, min, max) {
+      const n = Number(value);
+      if (isNaN(n)) return min;
+      return Math.min(Math.max(n, min), max);
+    }
+
     function formatCurrency(value) {
       return "$" + value.toLocaleString("en-US", {
         minimumFractionDigits: 0,
@@ -446,94 +421,120 @@
     }
 
     function calculateEstimate() {
-      const txSelect = document.getElementById("transactions");
-      const accountsSelect = document.getElementById("accounts");
-      const employeesInput = document.getElementById("employees");
-      const cleanupRadios = document.querySelectorAll("input[name='cleanup']");
+      const txAmount = Number(document.getElementById("transactions").value) || 0;
+
+      const bankAccounts = clamp(
+        document.getElementById("bank-accounts").value,
+        0,
+        20
+      );
+      const cardAccounts = clamp(
+        document.getElementById("card-accounts").value,
+        0,
+        30
+      );
+      const employees = clamp(
+        document.getElementById("employees").value,
+        0,
+        250
+      );
+      const monthsBehind = clamp(
+        document.getElementById("months-behind").value,
+        0,
+        36
+      );
       const currentMethod = document.getElementById("current-method").value;
 
-      const txAmount = Number(txSelect.value) || 0;
-      const accountsAmount = Number(accountsSelect.value) || 0;
+      // --- Monthly pricing logic ---
+      const baseAmount = 200; // base ongoing support
 
-      const employees = Math.max(
-        0,
-        Math.min(250, Number(employeesInput.value) || 0)
-      );
-      const payrollAmount = employees * 20; // $20 / employee per month as a rough guide
+      // Accounts complexity: small bump per active account, with a cap
+      let accountAmount = bankAccounts * 15 + cardAccounts * 10;
+      if (accountAmount > 250) accountAmount = 250;
 
-      let cleanupValue = "no";
-      cleanupRadios.forEach((r) => {
-        if (r.checked) cleanupValue = r.value;
-      });
+      // Payroll handling: simple per-head estimate with a cap
+      let payrollAmount = employees * 20;
+      if (payrollAmount > 500) payrollAmount = 500;
 
-      const baseAmount = 200; // base monthly support
+      const monthlyLow = baseAmount + txAmount + accountAmount + payrollAmount;
+      const monthlyHigh = monthlyLow + 150; // give a healthy but not crazy range
 
-      const cleanupMonthly = cleanupValue === "yes" ? 75 : 0;
-
-      const low = baseAmount + txAmount + accountsAmount + payrollAmount;
-      const high = low + 100 + (cleanupMonthly ? 50 : 0);
-
+      // Update monthly breakdown
       document.getElementById("base-amount").textContent =
         formatCurrency(baseAmount);
       document.getElementById("tx-amount").textContent =
         formatCurrency(txAmount);
-      document.getElementById("accounts-amount").textContent =
-        accountsAmount > 0 ? formatCurrency(accountsAmount) : "$0";
+      document.getElementById("account-amount").textContent =
+        accountAmount > 0 ? formatCurrency(accountAmount) : "$0";
       document.getElementById("payroll-amount").textContent =
         payrollAmount > 0 ? formatCurrency(payrollAmount) : "$0";
-      document.getElementById("cleanup-amount").textContent =
-        cleanupMonthly > 0 ? "~" + formatCurrency(cleanupMonthly) : "$0";
 
       document.getElementById("estimate-range").textContent =
-        formatCurrency(low) + " – " + formatCurrency(high);
+        formatCurrency(monthlyLow) + " – " + formatCurrency(monthlyHigh);
 
+      // Caption logic – purely descriptive
       const captionEl = document.getElementById("estimate-caption");
-
       let caption = "Typical range for a small Oregon-based business.";
 
-      if (cleanupValue === "yes") {
+      if (currentMethod === "self") {
         caption =
-          "Ongoing monthly range. One-time catch-up work is usually quoted separately.";
+          "Approximate monthly investment to move bookkeeping off your plate and onto a professional.";
       } else if (currentMethod === "none") {
         caption =
-          "Good starting point if your books haven’t really been maintained yet.";
+          "Good starting point if your books haven’t really been maintained yet and you’re setting things up correctly.";
       } else if (currentMethod === "other-bookkeeper") {
         caption =
-          "Useful if you’re comparing against your current bookkeeping setup.";
-      } else if (currentMethod === "self") {
+          "Useful if you’re comparing your current bookkeeping arrangement against an outsourced Oregon-based partner.";
+      } else if (currentMethod === "in-house") {
         caption =
-          "Approximate investment to move bookkeeping off your plate each month.";
+          "Rough comparison point if you’re wondering how an outside firm would price similar ongoing work.";
       }
 
       captionEl.textContent = caption;
+
+      // --- Cleanup project logic (separate from monthly) ---
+      const cleanupBox = document.getElementById("cleanup-box");
+      const cleanupText = document.getElementById("cleanup-text");
+
+      if (monthsBehind <= 0) {
+        cleanupText.textContent =
+          "You’re current on your books, so no separate cleanup project is assumed.";
+        return;
+      }
+
+      // Use monthlyLow as a proxy for complexity, then scale by months behind.
+      // Keep the range fairly broad so you have room in real proposals.
+      const cleanupLow = Math.round(monthlyLow * 0.6 * monthsBehind);
+      const cleanupHigh = Math.round(monthlyLow * 1.1 * monthsBehind);
+
+      cleanupText.textContent =
+        "Based on your inputs, a one-time catch-up project for about " +
+        monthsBehind +
+        (monthsBehind === 1 ? " month " : " months ") +
+        "behind could reasonably land in the range of " +
+        formatCurrency(cleanupLow) +
+        " – " +
+        formatCurrency(cleanupHigh) +
+        ". Actual pricing would depend on how messy things are, how many systems are involved, and what deliverables you need.";
     }
 
     // Attach listeners
-    document
-      .getElementById("transactions")
-      .addEventListener("change", calculateEstimate);
-    document
-      .getElementById("accounts")
-      .addEventListener("change", calculateEstimate);
-    document
-      .getElementById("employees")
-      .addEventListener("input", calculateEstimate);
-    document
-      .querySelectorAll("input[name='cleanup']")
-      .forEach((el) =>
-        el.addEventListener("change", (e) => {
-          document
-            .querySelectorAll("#cleanup-toggle .pill-toggle")
-            .forEach((label) => label.classList.remove("active"));
-          e.target.closest(".pill-toggle").classList.add("active");
-          calculateEstimate();
-        })
-      );
+    ["transactions", "bank-accounts", "card-accounts", "employees", "months-behind"].forEach(
+      (id) => {
+        document
+          .getElementById(id)
+          .addEventListener("input", calculateEstimate);
+        document
+          .getElementById(id)
+          .addEventListener("change", calculateEstimate);
+      }
+    );
+
     document
       .getElementById("current-method")
       .addEventListener("change", calculateEstimate);
 
-    // Initial calc
+    // Initial calculation
     calculateEstimate();
   </script>
 </body>
