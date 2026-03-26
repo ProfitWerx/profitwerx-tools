@@ -3,10 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <title>Monthly Bookkeeping Cost Estimator | ProfitWerx Tools</title>
-  <meta name="description"
-  content="Estimate monthly bookkeeping costs for small businesses in Oregon, includes a separate estimate for one-time catch-up or cleanup projects. Provided by ProfitWerx." />
+  <meta
+    name="description"
+    content="Estimate monthly bookkeeping costs for small businesses in Oregon, including a separate estimate for one-time catch-up or cleanup projects. Provided by ProfitWerx."
+  />
   <link rel="icon" href="/favicon.png" type="image/png" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <style>
     :root {
       --bg: #0f172a;
@@ -141,6 +144,7 @@
       -webkit-appearance: none;
       margin: 0;
     }
+
     input[type="number"] {
       -moz-appearance: textfield;
     }
@@ -150,6 +154,8 @@
       align-items: baseline;
       justify-content: space-between;
       margin-bottom: 12px;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
     .estimate-pill {
@@ -207,14 +213,14 @@
     }
 
     .note {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-top: 16px !important;
-}
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 16px !important;
+    }
 
-.note strong {
-  color: #374151;
-}
+    .note strong {
+      color: #374151;
+    }
 
     .brand-footer {
       margin-top: 16px;
@@ -248,15 +254,16 @@
       margin-bottom: 4px;
     }
   </style>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-94LEWSM2S0"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-94LEWSM2S0');
-</script>
 
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-94LEWSM2S0"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-94LEWSM2S0');
+  </script>
 </head>
+
 <body>
   <main class="shell">
     <header class="heading">
@@ -362,28 +369,28 @@
       <!-- RIGHT: RESULT -->
       <section class="card" aria-label="Estimated cost">
         <div class="result-header">
-          <h2>Estimated monthly investment</h2>
+          <h2>Estimated monthly package</h2>
           <span class="estimate-pill">Ballpark estimate – not a quote</span>
         </div>
 
-        <div class="estimate-main" id="estimate-range">$375 – $475</div>
+        <div class="estimate-main" id="estimate-range">$550 – $800/mo</div>
         <div class="estimate-sub" id="estimate-caption">
-          Typical range for a small Oregon-based service business with light payroll.
+          Growth package estimate for a small Oregon-based business with moderate activity.
         </div>
 
         <div class="estimate-breakdown">
           <dl>
-            <dt>Base service level</dt>
-            <dd id="base-amount">$200</dd>
+            <dt>Recommended package</dt>
+            <dd id="base-amount">Growth</dd>
 
-            <dt>Transaction volume</dt>
-            <dd id="tx-amount">$175</dd>
+            <dt>Best fit for</dt>
+            <dd id="tx-amount">LLCs, moderate transactions</dd>
 
-            <dt>Account reconciliations (bank & cards)</dt>
-            <dd id="account-amount">$60</dd>
+            <dt>Recommended monthly</dt>
+            <dd id="account-amount">$650/mo</dd>
 
-            <dt>Payroll handling</dt>
-            <dd id="payroll-amount">$40</dd>
+            <dt>Pricing range</dt>
+            <dd id="payroll-amount">$550 – $800/mo</dd>
           </dl>
         </div>
 
@@ -396,9 +403,9 @@
 
         <p class="note">
           <strong>This tool is intentionally conservative.</strong>
-          It’s meant to give you a realistic Oregon-based range, not the lowest possible
+          It’s meant to give you a realistic Oregon-based package range, not the lowest possible
           number. Actual pricing depends on industry, software stack, reporting needs,
-          and how organized your records are.
+          payroll complexity, and how organized your records are.
         </p>
 
         <p class="note">
@@ -432,84 +439,127 @@
     }
 
     function calculateEstimate() {
-      const txAmount = Number(document.getElementById("transactions").value) || 0;
+      const txSelect = document.getElementById("transactions");
+      const txBandIndex = txSelect.selectedIndex;
 
       const bankAccounts = clamp(
         document.getElementById("bank-accounts").value,
         0,
         20
       );
+
       const cardAccounts = clamp(
         document.getElementById("card-accounts").value,
         0,
         30
       );
+
       const employees = clamp(
         document.getElementById("employees").value,
         0,
         250
       );
+
       const monthsBehind = clamp(
         document.getElementById("months-behind").value,
         0,
         36
       );
+
       const currentMethod = document.getElementById("current-method").value;
 
-      // --- Monthly pricing logic ---
-      const baseAmount = 200; // base ongoing support
+      const totalAccounts = bankAccounts + cardAccounts;
+      const hasPayroll = employees > 0;
+      const heavyTransactions = txBandIndex >= 3;      // 301–600 or 600+
+      const lowTransactions = txBandIndex <= 1;        // up to 150
 
-      // Account Reconciliations: small bump per active account, with a cap
-      let accountAmount = bankAccounts * 15 + cardAccounts * 10;
-      if (accountAmount > 250) accountAmount = 250;
+      let tierName = "";
+      let tierAudience = "";
+      let monthlyLow = 0;
+      let monthlyHigh = 0;
 
-      // Payroll handling: simple per-head estimate with a cap
-      const PAYROLL_BASE_FEE = 50;
-      const PAYROLL_PER_EMPLOYEE = 10;
-      let payrollAmount = 0;
-      if (employees > 0) {
-      payrollAmount =
-      PAYROLL_BASE_FEE + employees * PAYROLL_PER_EMPLOYEE;
-      }      
+      // Tier assignment
+      // Starter is kept intentionally simple.
+      if (lowTransactions && totalAccounts <= 4 && employees === 0) {
+        tierName = "Starter";
+        tierAudience = "Sole props, very low volume";
+        monthlyLow = 300;
+        monthlyHigh = 450;
+      } else if (!heavyTransactions && totalAccounts <= 8 && employees <= 5) {
+        tierName = "Growth";
+        tierAudience = "LLCs, moderate transactions";
+        monthlyLow = 550;
+        monthlyHigh = 800;
+      } else {
+        tierName = "Full-Service";
+        tierAudience = "Multiple accounts, payroll, reporting";
+        monthlyLow = 900;
+        monthlyHigh = 1200;
+      }
 
-      const monthlyLow = baseAmount + txAmount + accountAmount + payrollAmount;
-      const monthlyHigh = monthlyLow + 150; // give a healthy but not crazy range
+      // Position estimate within the package band
+      let score = 0;
 
-      // Update monthly breakdown
-      document.getElementById("base-amount").textContent =
-        formatCurrency(baseAmount);
-      document.getElementById("tx-amount").textContent =
-        formatCurrency(txAmount);
-      document.getElementById("account-amount").textContent =
-        accountAmount > 0 ? formatCurrency(accountAmount) : "$0";
-      document.getElementById("payroll-amount").textContent =
-        payrollAmount > 0 ? formatCurrency(payrollAmount) : "$0";
+      // Transactions
+      if (txBandIndex === 0) score += 5;
+      if (txBandIndex === 1) score += 15;
+      if (txBandIndex === 2) score += 35;
+      if (txBandIndex === 3) score += 70;
+      if (txBandIndex === 4) score += 100;
 
+      // Accounts
+      if (totalAccounts >= 3 && totalAccounts <= 4) score += 10;
+      if (totalAccounts >= 5 && totalAccounts <= 8) score += 25;
+      if (totalAccounts >= 9) score += 45;
+
+      // Employees
+      if (employees >= 1 && employees <= 2) score += 15;
+      if (employees >= 3 && employees <= 5) score += 30;
+      if (employees >= 6) score += 50;
+
+      // Current method nudge
+      if (currentMethod === "none") score += 10;
+      if (currentMethod === "in-house") score += 5;
+
+      score = Math.min(score, 100);
+
+      const recommendedMonthly = Math.round(
+        monthlyLow + ((monthlyHigh - monthlyLow) * score / 100)
+      );
+
+      // Update main range
       document.getElementById("estimate-range").textContent =
-        formatCurrency(monthlyLow) + " – " + formatCurrency(monthlyHigh);
+        formatCurrency(monthlyLow) + " – " + formatCurrency(monthlyHigh) + "/mo";
 
-      // Caption logic – purely descriptive
+      // Update breakdown
+      document.getElementById("base-amount").textContent = tierName;
+      document.getElementById("tx-amount").textContent = tierAudience;
+      document.getElementById("account-amount").textContent =
+        formatCurrency(recommendedMonthly) + "/mo";
+      document.getElementById("payroll-amount").textContent =
+        formatCurrency(monthlyLow) + " – " + formatCurrency(monthlyHigh) + "/mo";
+
+      // Caption logic
       const captionEl = document.getElementById("estimate-caption");
-      let caption = "Typical range for a small Oregon-based business.";
+      let caption = tierName + " package estimate for a small Oregon-based business.";
 
       if (currentMethod === "self") {
         caption =
-          "Approximate monthly investment to move bookkeeping off your plate and onto a professional.";
+          "Approximate monthly investment to move bookkeeping off your plate and into a reliable ongoing system.";
       } else if (currentMethod === "none") {
         caption =
-          "Good starting point if your books haven’t really been maintained yet and you’re setting things up correctly.";
+          "Good starting point if bookkeeping has not really been maintained and you need to get things under control.";
       } else if (currentMethod === "other-bookkeeper") {
         caption =
-          "Useful if you’re comparing your current bookkeeping arrangement against an outsourced Oregon-based partner.";
+          "Useful if you’re comparing your current bookkeeping arrangement against a more structured Oregon-based service.";
       } else if (currentMethod === "in-house") {
         caption =
-          "Rough comparison point if you’re wondering how an outside firm would price similar ongoing work.";
+          "Rough comparison point if you’re considering outsourcing work that is currently handled internally.";
       }
 
       captionEl.textContent = caption;
 
-      // --- Cleanup project logic (separate from monthly) ---
-      const cleanupBox = document.getElementById("cleanup-box");
+      // Cleanup estimate
       const cleanupText = document.getElementById("cleanup-text");
 
       if (monthsBehind <= 0) {
@@ -518,10 +568,8 @@
         return;
       }
 
-      // Use monthlyLow as a proxy for complexity, then scale by months behind.
-      // Keep the range fairly broad so you have room in real proposals.
-      const cleanupLow = Math.round(monthlyLow * 0.6 * monthsBehind);
-      const cleanupHigh = Math.round(monthlyLow * 1.1 * monthsBehind);
+      const cleanupLow = Math.round(monthlyLow * 0.75 * monthsBehind);
+      const cleanupHigh = Math.round(monthlyHigh * 1.1 * monthsBehind);
 
       cleanupText.textContent =
         "Based on your inputs, a one-time catch-up project for about " +
@@ -531,18 +579,13 @@
         formatCurrency(cleanupLow) +
         " – " +
         formatCurrency(cleanupHigh) +
-        ". Actual pricing would depend on how messy things are, how many systems are involved, and what deliverables you need.";
+        ". Actual pricing would depend on record quality, account cleanup needs, payroll complexity, and how much correction work is involved.";
     }
 
-    // Attach listeners
     ["transactions", "bank-accounts", "card-accounts", "employees", "months-behind"].forEach(
       (id) => {
-        document
-          .getElementById(id)
-          .addEventListener("input", calculateEstimate);
-        document
-          .getElementById(id)
-          .addEventListener("change", calculateEstimate);
+        document.getElementById(id).addEventListener("input", calculateEstimate);
+        document.getElementById(id).addEventListener("change", calculateEstimate);
       }
     );
 
@@ -550,7 +593,6 @@
       .getElementById("current-method")
       .addEventListener("change", calculateEstimate);
 
-    // Initial calculation
     calculateEstimate();
   </script>
 </body>
