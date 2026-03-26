@@ -13,37 +13,27 @@ function formatCurrency(value) {
 
 function calculateEstimate() {
   const txSelect = document.getElementById("transactions");
+  if (!txSelect) return;
+
   const txBandIndex = txSelect.selectedIndex;
 
-  const bankAccounts = clamp(
-    document.getElementById("bank-accounts").value,
-    0,
-    20
-  );
+  const bankAccountsEl = document.getElementById("bank-accounts");
+  const cardAccountsEl = document.getElementById("card-accounts");
+  const employeesEl = document.getElementById("employees");
+  const monthsBehindEl = document.getElementById("months-behind");
+  const currentMethodEl = document.getElementById("current-method");
 
-  const cardAccounts = clamp(
-    document.getElementById("card-accounts").value,
-    0,
-    30
-  );
+  if (!bankAccountsEl || !cardAccountsEl || !employeesEl || !monthsBehindEl || !currentMethodEl) {
+    return;
+  }
 
-  const employees = clamp(
-    document.getElementById("employees").value,
-    0,
-    250
-  );
-
-  const monthsBehind = clamp(
-    document.getElementById("months-behind").value,
-    0,
-    36
-  );
-
-  const currentMethod = document.getElementById("current-method").value;
+  const bankAccounts = clamp(bankAccountsEl.value, 0, 20);
+  const cardAccounts = clamp(cardAccountsEl.value, 0, 30);
+  const employees = clamp(employeesEl.value, 0, 250);
+  const monthsBehind = clamp(monthsBehindEl.value, 0, 36);
+  const currentMethod = currentMethodEl.value;
 
   const totalAccounts = bankAccounts + cardAccounts;
-
-  // Allows zero defaults without making the calculator look broken.
   const adjustedAccounts = Math.max(1, totalAccounts);
 
   const heavyTransactions = txBandIndex >= 3; // 301–600 or 600+
@@ -54,6 +44,7 @@ function calculateEstimate() {
   let monthlyLow = 0;
   let monthlyHigh = 0;
 
+  // Package logic
   if (lowTransactions && adjustedAccounts <= 4 && employees === 0) {
     tierName = "Starter";
     tierAudience = "Sole props, very low volume";
@@ -71,6 +62,7 @@ function calculateEstimate() {
     monthlyHigh = 1200;
   }
 
+  // Score to place estimate inside the package range
   let score = 0;
 
   // Transactions
@@ -81,7 +73,6 @@ function calculateEstimate() {
   if (txBandIndex === 4) score += 100;
 
   // Accounts
-  if (adjustedAccounts === 1) score += 0;
   if (adjustedAccounts >= 2 && adjustedAccounts <= 4) score += 10;
   if (adjustedAccounts >= 5 && adjustedAccounts <= 8) score += 25;
   if (adjustedAccounts >= 9) score += 45;
@@ -91,7 +82,7 @@ function calculateEstimate() {
   if (employees >= 3 && employees <= 5) score += 30;
   if (employees >= 6) score += 50;
 
-  // Current method
+  // Situation modifier
   if (currentMethod === "none") score += 10;
   if (currentMethod === "in-house") score += 5;
 
@@ -101,125 +92,31 @@ function calculateEstimate() {
     monthlyLow + ((monthlyHigh - monthlyLow) * score / 100)
   );
 
-  document.getElementById("estimate-range").textContent =
-    formatCurrency(monthlyLow) + " – " + formatCurrency(monthlyHigh) + "/mo";
+  // Outputs
+  const estimateRangeEl = document.getElementById("estimate-range");
+  const estimateCaptionEl = document.getElementById("estimate-caption");
+  const baseAmountEl = document.getElementById("base-amount");
+  const txAmountEl = document.getElementById("tx-amount");
+  const accountAmountEl = document.getElementById("account-amount");
+  const payrollAmountEl = document.getElementById("payroll-amount");
+  const cleanupTextEl = document.getElementById("cleanup-text");
 
-  document.getElementById("base-amount").textContent = tierName;
-  document.getElementById("tx-amount").textContent = tierAudience;
-  document.getElementById("account-amount").textContent =
-    formatCurrency(recommendedMonthly) + "/mo";
-  document.getElementById("payroll-amount").textContent =
-    formatCurrency(monthlyLow) + " – " + formatCurrency(monthlyHigh) + "/mo";
-
-  const captionEl = document.getElementById("estimate-caption");
-  let caption = tierName + " package estimate for a small Oregon-based business.";
-
-  if (currentMethod === "self") {
-    caption =
-      "Approximate monthly investment to move bookkeeping off your plate and into a reliable ongoing system.";
-  } else if (currentMethod === "none") {
-    caption =
-      "Good starting point if bookkeeping has not really been maintained and you need to get things under control.";
-  } else if (currentMethod === "other-bookkeeper") {
-    caption =
-      "Useful if you’re comparing your current bookkeeping arrangement against a more structured Oregon-based service.";
-  } else if (currentMethod === "in-house") {
-    caption =
-      "Rough comparison point if you’re considering outsourcing work that is currently handled internally.";
-  }
-
-  captionEl.textContent = caption;
-
-  const cleanupText = document.getElementById("cleanup-text");
-
-  if (monthsBehind <= 0) {
-    cleanupText.textContent =
-      "You’re current on your books, so no separate cleanup project is assumed.";
-    return;
-  }
-
-  const cleanupLow = Math.round(monthlyLow * 0.75 * monthsBehind);
-  const cleanupHigh = Math.round(monthlyHigh * 1.1 * monthsBehind);
-
-  cleanupText.textContent =
-    "Based on your inputs, a one-time catch-up project for about " +
-    monthsBehind +
-    (monthsBehind === 1 ? " month " : " months ") +
-    "behind could reasonably land in the range of " +
-    formatCurrency(cleanupLow) +
-    " – " +
-    formatCurrency(cleanupHigh) +
-    ". Actual pricing would depend on record quality, account cleanup needs, payroll complexity, and how much correction work is involved.";
-}
-
-["transactions", "bank-accounts", "card-accounts", "employees", "months-behind"].forEach(
-  (id) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.addEventListener("input", calculateEstimate);
-      el.addEventListener("change", calculateEstimate);
-    }
-  }
-);
-
-const currentMethodEl = document.getElementById("current-method");
-if (currentMethodEl) {
-  currentMethodEl.addEventListener("change", calculateEstimate);
-}
-
-calculateEstimate();      monthlyLow = 550;
-      monthlyHigh = 800;
-    } else {
-      tierName = "Full-Service";
-      tierAudience = "Multiple accounts, payroll, reporting";
-      monthlyLow = 900;
-      monthlyHigh = 1200;
-    }
-
-    // Score to position the estimate within the selected tier
-    let score = 0;
-
-    // Transactions
-    if (txBandIndex === 0) score += 5;
-    if (txBandIndex === 1) score += 15;
-    if (txBandIndex === 2) score += 35;
-    if (txBandIndex === 3) score += 70;
-    if (txBandIndex === 4) score += 100;
-
-    // Accounts
-    if (totalAccounts >= 3 && totalAccounts <= 4) score += 10;
-    if (totalAccounts >= 5 && totalAccounts <= 8) score += 25;
-    if (totalAccounts >= 9) score += 45;
-
-    // Employees
-    if (employees >= 1 && employees <= 2) score += 15;
-    if (employees >= 3 && employees <= 5) score += 30;
-    if (employees >= 6) score += 50;
-
-    // If books are not being done, nudge upward
-    if (currentMethod === "none") score += 10;
-    if (currentMethod === "in-house") score += 5;
-
-    score = Math.min(score, 100);
-
-    const recommendedMonthly = Math.round(
-      monthlyLow + ((monthlyHigh - monthlyLow) * score / 100)
-    );
-
-    // Update main range
-    document.getElementById("estimate-range").textContent =
+  if (estimateRangeEl) {
+    estimateRangeEl.textContent =
       formatCurrency(monthlyLow) + " – " + formatCurrency(monthlyHigh) + "/mo";
+  }
 
-    // Update breakdown
-    document.getElementById("base-amount").textContent = tierName;
-    document.getElementById("tx-amount").textContent = tierAudience;
-    document.getElementById("account-amount").textContent =
-      formatCurrency(recommendedMonthly) + "/mo";
-    document.getElementById("payroll-amount").textContent =
+  if (baseAmountEl) baseAmountEl.textContent = tierName;
+  if (txAmountEl) txAmountEl.textContent = tierAudience;
+  if (accountAmountEl) {
+    accountAmountEl.textContent = formatCurrency(recommendedMonthly) + "/mo";
+  }
+  if (payrollAmountEl) {
+    payrollAmountEl.textContent =
       formatCurrency(monthlyLow) + " – " + formatCurrency(monthlyHigh) + "/mo";
+  }
 
-    // Caption logic
-    const captionEl = document.getElementById("estimate-caption");
+  if (estimateCaptionEl) {
     let caption = tierName + " package estimate for a small Oregon-based business.";
 
     if (currentMethod === "self") {
@@ -236,137 +133,41 @@ calculateEstimate();      monthlyLow = 550;
         "Rough comparison point if you’re considering outsourcing work that is currently handled internally.";
     }
 
-    captionEl.textContent = caption;
-
-    // Cleanup estimate
-    const cleanupText = document.getElementById("cleanup-text");
-
-    if (monthsBehind <= 0) {
-      cleanupText.textContent =
-        "You’re current on your books, so no separate cleanup project is assumed.";
-      return;
-    }
-
-    const cleanupLow = Math.round(monthlyLow * 0.75 * monthsBehind);
-    const cleanupHigh = Math.round(monthlyHigh * 1.1 * monthsBehind);
-
-    cleanupText.textContent =
-      "Based on your inputs, a one-time catch-up project for about " +
-      monthsBehind +
-      (monthsBehind === 1 ? " month " : " months ") +
-      "behind could reasonably land in the range of " +
-      formatCurrency(cleanupLow) +
-      " – " +
-      formatCurrency(cleanupHigh) +
-      ". Actual pricing would depend on record quality, account cleanup needs, and how much correction work is involved.";
+    estimateCaptionEl.textContent = caption;
   }
 
-  // Attach listeners
-  ["transactions", "bank-accounts", "card-accounts", "employees", "months-behind"].forEach(
-    (id) => {
-      document.getElementById(id).addEventListener("input", calculateEstimate);
-      document.getElementById(id).addEventListener("change", calculateEstimate);
-    }
-  );
+  if (cleanupTextEl) {
+    if (monthsBehind <= 0) {
+      cleanupTextEl.textContent =
+        "You’re current on your books, so no separate cleanup project is assumed.";
+    } else {
+      const cleanupLow = Math.round(monthlyLow * 0.75 * monthsBehind);
+      const cleanupHigh = Math.round(monthlyHigh * 1.1 * monthsBehind);
 
-  document
-    .getElementById("current-method")
-    .addEventListener("change", calculateEstimate);
-
-  calculateEstimate();
-</script>    const lowMonthly = BASE_AMOUNT + txAmount + payrollAmount;
-    const highMonthly = Math.round(lowMonthly * 1.25); // 25% buffer
-
-    // ---- CLEANUP ESTIMATE (ONE-TIME) ----
-    let cleanupLow = 0;
-    let cleanupHigh = 0;
-    if (wantsCleanup && monthsBehind > 0) {
-      cleanupLow = Math.round(
-        lowMonthly * CLEANUP_LOW_MULTIPLIER * monthsBehind
-      );
-      cleanupHigh = Math.round(
-        highMonthly * CLEANUP_HIGH_MULTIPLIER * monthsBehind
-      );
-    }
-
-    // ---- UPDATE BREAKDOWN ----
-    document.getElementById("base-amount").textContent =
-      formatCurrency(BASE_AMOUNT);
-    document.getElementById("tx-amount").textContent =
-      formatCurrency(txAmount);
-    document.getElementById("payroll-amount").textContent =
-      payrollAmount > 0 ? formatCurrency(payrollAmount) : "$0";
-
-    const cleanupAmountEl = document.getElementById("cleanup-amount");
-    if (cleanupLow > 0 && cleanupHigh > 0) {
-      cleanupAmountEl.textContent =
-        "≈ " +
+      cleanupTextEl.textContent =
+        "Based on your inputs, a one-time catch-up project for about " +
+        monthsBehind +
+        (monthsBehind === 1 ? " month " : " months ") +
+        "behind could reasonably land in the range of " +
         formatCurrency(cleanupLow) +
         " – " +
         formatCurrency(cleanupHigh) +
-        " (one-time)";
-    } else {
-      cleanupAmountEl.textContent = "$0";
+        ".";
     }
-
-    // ---- UPDATE MAIN RANGE ----
-    document.getElementById("estimate-range").textContent =
-      formatCurrency(lowMonthly) + " – " + formatCurrency(highMonthly);
-
-    // ---- CAPTION LOGIC ----
-    const captionEl = document.getElementById("estimate-caption");
-    let caption = "Typical range for a small Oregon-based business.";
-
-    if (wantsCleanup && monthsBehind > 0) {
-      caption =
-        "Ongoing monthly range shown above. One-time catch-up estimate is based on about " +
-        monthsBehind +
-        (monthsBehind === 1 ? " month" : " months") +
-        " behind.";
-    } else if (currentMethod === "none") {
-      caption =
-        "Good starting point if your books haven’t really been maintained yet.";
-    } else if (currentMethod === "other-bookkeeper") {
-      caption =
-        "Useful if you’re comparing against your current bookkeeping setup.";
-    } else if (currentMethod === "self") {
-      caption =
-        "Approximate investment to move bookkeeping off your plate each month.";
-    }
-
-    captionEl.textContent = caption;
   }
+}
 
-  // ---- EVENT LISTENERS ----
-  document
-    .getElementById("transactions")
-    .addEventListener("change", calculateEstimate);
-
-  document
-    .getElementById("employees")
-    .addEventListener("input", calculateEstimate);
-
-  document
-    .querySelectorAll("input[name='cleanup']")
-    .forEach((el) =>
-      el.addEventListener("change", (e) => {
-        document
-          .querySelectorAll("#cleanup-toggle .pill-toggle")
-          .forEach((label) => label.classList.remove("active"));
-        e.target.closest(".pill-toggle").classList.add("active");
-        calculateEstimate();
-      })
-    );
-
-  document
-    .getElementById("current-method")
-    .addEventListener("change", calculateEstimate);
-
-  const monthsBehindInputInit = document.getElementById("months-behind");
-  if (monthsBehindInputInit) {
-    monthsBehindInputInit.addEventListener("input", calculateEstimate);
+["transactions", "bank-accounts", "card-accounts", "employees", "months-behind"].forEach((id) => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener("input", calculateEstimate);
+    el.addEventListener("change", calculateEstimate);
   }
+});
 
-  // Initial calc on load
-  calculateEstimate();
-</script>
+const currentMethodEl = document.getElementById("current-method");
+if (currentMethodEl) {
+  currentMethodEl.addEventListener("change", calculateEstimate);
+}
+
+calculateEstimate();
