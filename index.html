@@ -14,12 +14,11 @@
     :root {
       --bg: #0f172a;
       --card-bg: #ffffff;
-      --accent: #16a34a;
+      --accent: #5d975f;
       --accent-soft: #dcfce7;
       --text-main: #0f172a;
       --text-muted: #6b7280;
       --border-soft: #e5e7eb;
-      --danger: #b91c1c;
       --radius-lg: 16px;
       --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.18);
     }
@@ -112,12 +111,14 @@
       margin-bottom: 4px;
       font-size: 0.9rem;
       font-weight: 500;
+      gap: 12px;
     }
 
     .field-label span.help {
       font-size: 0.78rem;
       font-weight: 400;
       color: var(--text-muted);
+      text-align: right;
     }
 
     select,
@@ -135,7 +136,7 @@
     input[type="number"]:focus {
       outline: none;
       border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(22, 163, 74, 0.35);
+      box-shadow: 0 0 0 1px rgba(93, 151, 95, 0.35);
       background: white;
     }
 
@@ -212,6 +213,20 @@
       font-variant-numeric: tabular-nums;
     }
 
+    .cleanup-box {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #fefce8;
+      border: 1px solid #facc15;
+      font-size: 0.83rem;
+    }
+
+    .cleanup-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
     .note {
       font-size: 0.8rem;
       color: var(--text-muted);
@@ -240,18 +255,11 @@
       text-decoration: underline;
     }
 
-    .cleanup-box {
-      margin-top: 12px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      background: #fefce8;
-      border: 1px solid #facc15;
-      font-size: 0.83rem;
-    }
-
-    .cleanup-title {
-      font-weight: 600;
-      margin-bottom: 4px;
+    .starter-hint {
+      font-size: 0.84rem;
+      color: #64748b;
+      margin-top: -4px !important;
+      margin-bottom: 14px !important;
     }
   </style>
 
@@ -274,10 +282,11 @@
     </header>
 
     <section class="grid">
-      <!-- LEFT: INPUTS -->
       <section class="card" aria-label="Bookkeeping inputs">
         <h2>Your business details</h2>
-        <p>Adjust the fields to match your current situation as closely as you can.</p>
+        <p class="starter-hint">
+          Start with your basic situation, then add complexity as needed.
+        </p>
 
         <div class="field">
           <div class="field-label">
@@ -285,7 +294,7 @@
             <span class="help">Total bank / credit card / other entries</span>
           </div>
           <select id="transactions">
-            <option value="100">0 – 50 transactions / month</option>
+            <option value="100" selected>0 – 50 transactions / month</option>
             <option value="175">51 – 150 transactions / month</option>
             <option value="250">151 – 300 transactions / month</option>
             <option value="350">301 – 600 transactions / month</option>
@@ -298,14 +307,7 @@
             <label for="bank-accounts">Active bank accounts</label>
             <span class="help">Checking / savings accounts you reconcile</span>
           </div>
-          <input
-            id="bank-accounts"
-            type="number"
-            min="0"
-            max="20"
-            value="2"
-            inputmode="numeric"
-          />
+          <input id="bank-accounts" type="number" min="0" max="20" value="0" inputmode="numeric" />
         </div>
 
         <div class="field">
@@ -313,14 +315,7 @@
             <label for="card-accounts">Active credit card accounts</label>
             <span class="help">Business cards you use regularly</span>
           </div>
-          <input
-            id="card-accounts"
-            type="number"
-            min="0"
-            max="30"
-            value="2"
-            inputmode="numeric"
-          />
+          <input id="card-accounts" type="number" min="0" max="30" value="0" inputmode="numeric" />
         </div>
 
         <div class="field">
@@ -328,14 +323,7 @@
             <label for="employees">Number of employees on payroll</label>
             <span class="help">Include owners if they’re paid through payroll</span>
           </div>
-          <input
-            id="employees"
-            type="number"
-            min="0"
-            max="250"
-            value="2"
-            inputmode="numeric"
-          />
+          <input id="employees" type="number" min="0" max="250" value="0" inputmode="numeric" />
         </div>
 
         <div class="field">
@@ -343,14 +331,7 @@
             <label for="months-behind">Months behind on bookkeeping</label>
             <span class="help">0 if you’re fully current</span>
           </div>
-          <input
-            id="months-behind"
-            type="number"
-            min="0"
-            max="36"
-            value="0"
-            inputmode="numeric"
-          />
+          <input id="months-behind" type="number" min="0" max="36" value="0" inputmode="numeric" />
         </div>
 
         <div class="field">
@@ -358,7 +339,7 @@
             <span>How are you handling bookkeeping today?</span>
           </div>
           <select id="current-method">
-            <option value="self">I do it myself</option>
+            <option value="self" selected>I do it myself</option>
             <option value="none">It’s not really being done</option>
             <option value="other-bookkeeper">I have a bookkeeper now</option>
             <option value="in-house">In-house staff handles it</option>
@@ -366,31 +347,30 @@
         </div>
       </section>
 
-      <!-- RIGHT: RESULT -->
       <section class="card" aria-label="Estimated cost">
         <div class="result-header">
           <h2>Estimated monthly package</h2>
           <span class="estimate-pill">Ballpark estimate – not a quote</span>
         </div>
 
-        <div class="estimate-main" id="estimate-range">$550 – $800/mo</div>
+        <div class="estimate-main" id="estimate-range">$300 – $450/mo</div>
         <div class="estimate-sub" id="estimate-caption">
-          Growth package estimate for a small Oregon-based business with moderate activity.
+          Starter package estimate for a small Oregon-based business with a simple setup.
         </div>
 
         <div class="estimate-breakdown">
           <dl>
             <dt>Recommended package</dt>
-            <dd id="base-amount">Growth</dd>
+            <dd id="base-amount">Starter</dd>
 
             <dt>Best fit for</dt>
-            <dd id="tx-amount">LLCs, moderate transactions</dd>
+            <dd id="tx-amount">Sole props, very low volume</dd>
 
             <dt>Recommended monthly</dt>
-            <dd id="account-amount">$650/mo</dd>
+            <dd id="account-amount">$300/mo</dd>
 
             <dt>Pricing range</dt>
-            <dd id="payroll-amount">$550 – $800/mo</dd>
+            <dd id="payroll-amount">$300 – $450/mo</dd>
           </dl>
         </div>
 
@@ -403,15 +383,14 @@
 
         <p class="note">
           <strong>This tool is intentionally conservative.</strong>
-          It’s meant to give you a realistic Oregon-based package range, not the lowest possible
-          number. Actual pricing depends on industry, software stack, reporting needs,
-          payroll complexity, and how organized your records are.
+          It’s meant to give you a realistic Oregon-based package range, not the lowest possible number.
+          Actual pricing depends on industry, software stack, reporting needs, payroll complexity,
+          and how organized your records are.
         </p>
 
         <p class="note">
-          Cleanup estimates above are rough ranges based on the number of months you’re
-          behind and your typical monthly complexity. Formal proposals would spell out
-          scope, deliverables, and exact pricing.
+          Cleanup estimates above are rough ranges based on the number of months you’re behind and your
+          typical monthly complexity. Formal proposals would spell out scope, deliverables, and exact pricing.
         </p>
 
         <div class="brand-footer">
@@ -424,176 +403,6 @@
     </section>
   </main>
 
-  <script>
-    function clamp(value, min, max) {
-      const n = Number(value);
-      if (isNaN(n)) return min;
-      return Math.min(Math.max(n, min), max);
-    }
-
-    function formatCurrency(value) {
-      return "$" + value.toLocaleString("en-US", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      });
-    }
-
-    function calculateEstimate() {
-      const txSelect = document.getElementById("transactions");
-      const txBandIndex = txSelect.selectedIndex;
-
-      const bankAccounts = clamp(
-        document.getElementById("bank-accounts").value,
-        0,
-        20
-      );
-
-      const cardAccounts = clamp(
-        document.getElementById("card-accounts").value,
-        0,
-        30
-      );
-
-      const employees = clamp(
-        document.getElementById("employees").value,
-        0,
-        250
-      );
-
-      const monthsBehind = clamp(
-        document.getElementById("months-behind").value,
-        0,
-        36
-      );
-
-      const currentMethod = document.getElementById("current-method").value;
-
-      const totalAccounts = bankAccounts + cardAccounts;
-      const hasPayroll = employees > 0;
-      const heavyTransactions = txBandIndex >= 3;      // 301–600 or 600+
-      const lowTransactions = txBandIndex <= 1;        // up to 150
-
-      let tierName = "";
-      let tierAudience = "";
-      let monthlyLow = 0;
-      let monthlyHigh = 0;
-
-      // Tier assignment
-      // Starter is kept intentionally simple.
-      if (lowTransactions && totalAccounts <= 4 && employees === 0) {
-        tierName = "Starter";
-        tierAudience = "Sole props, very low volume";
-        monthlyLow = 300;
-        monthlyHigh = 450;
-      } else if (!heavyTransactions && totalAccounts <= 8 && employees <= 5) {
-        tierName = "Growth";
-        tierAudience = "LLCs, moderate transactions";
-        monthlyLow = 550;
-        monthlyHigh = 800;
-      } else {
-        tierName = "Full-Service";
-        tierAudience = "Multiple accounts, payroll, reporting";
-        monthlyLow = 900;
-        monthlyHigh = 1200;
-      }
-
-      // Position estimate within the package band
-      let score = 0;
-
-      // Transactions
-      if (txBandIndex === 0) score += 5;
-      if (txBandIndex === 1) score += 15;
-      if (txBandIndex === 2) score += 35;
-      if (txBandIndex === 3) score += 70;
-      if (txBandIndex === 4) score += 100;
-
-      // Accounts
-      if (totalAccounts >= 3 && totalAccounts <= 4) score += 10;
-      if (totalAccounts >= 5 && totalAccounts <= 8) score += 25;
-      if (totalAccounts >= 9) score += 45;
-
-      // Employees
-      if (employees >= 1 && employees <= 2) score += 15;
-      if (employees >= 3 && employees <= 5) score += 30;
-      if (employees >= 6) score += 50;
-
-      // Current method nudge
-      if (currentMethod === "none") score += 10;
-      if (currentMethod === "in-house") score += 5;
-
-      score = Math.min(score, 100);
-
-      const recommendedMonthly = Math.round(
-        monthlyLow + ((monthlyHigh - monthlyLow) * score / 100)
-      );
-
-      // Update main range
-      document.getElementById("estimate-range").textContent =
-        formatCurrency(monthlyLow) + " – " + formatCurrency(monthlyHigh) + "/mo";
-
-      // Update breakdown
-      document.getElementById("base-amount").textContent = tierName;
-      document.getElementById("tx-amount").textContent = tierAudience;
-      document.getElementById("account-amount").textContent =
-        formatCurrency(recommendedMonthly) + "/mo";
-      document.getElementById("payroll-amount").textContent =
-        formatCurrency(monthlyLow) + " – " + formatCurrency(monthlyHigh) + "/mo";
-
-      // Caption logic
-      const captionEl = document.getElementById("estimate-caption");
-      let caption = tierName + " package estimate for a small Oregon-based business.";
-
-      if (currentMethod === "self") {
-        caption =
-          "Approximate monthly investment to move bookkeeping off your plate and into a reliable ongoing system.";
-      } else if (currentMethod === "none") {
-        caption =
-          "Good starting point if bookkeeping has not really been maintained and you need to get things under control.";
-      } else if (currentMethod === "other-bookkeeper") {
-        caption =
-          "Useful if you’re comparing your current bookkeeping arrangement against a more structured Oregon-based service.";
-      } else if (currentMethod === "in-house") {
-        caption =
-          "Rough comparison point if you’re considering outsourcing work that is currently handled internally.";
-      }
-
-      captionEl.textContent = caption;
-
-      // Cleanup estimate
-      const cleanupText = document.getElementById("cleanup-text");
-
-      if (monthsBehind <= 0) {
-        cleanupText.textContent =
-          "You’re current on your books, so no separate cleanup project is assumed.";
-        return;
-      }
-
-      const cleanupLow = Math.round(monthlyLow * 0.75 * monthsBehind);
-      const cleanupHigh = Math.round(monthlyHigh * 1.1 * monthsBehind);
-
-      cleanupText.textContent =
-        "Based on your inputs, a one-time catch-up project for about " +
-        monthsBehind +
-        (monthsBehind === 1 ? " month " : " months ") +
-        "behind could reasonably land in the range of " +
-        formatCurrency(cleanupLow) +
-        " – " +
-        formatCurrency(cleanupHigh) +
-        ". Actual pricing would depend on record quality, account cleanup needs, payroll complexity, and how much correction work is involved.";
-    }
-
-    ["transactions", "bank-accounts", "card-accounts", "employees", "months-behind"].forEach(
-      (id) => {
-        document.getElementById(id).addEventListener("input", calculateEstimate);
-        document.getElementById(id).addEventListener("change", calculateEstimate);
-      }
-    );
-
-    document
-      .getElementById("current-method")
-      .addEventListener("change", calculateEstimate);
-
-    calculateEstimate();
-  </script>
+  <script src="calculator.js"></script>
 </body>
 </html>
