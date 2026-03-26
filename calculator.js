@@ -1,68 +1,173 @@
-<script>
-  function clamp(value, min, max) {
-    const n = Number(value);
-    if (isNaN(n)) return min;
-    return Math.min(Math.max(n, min), max);
+function clamp(value, min, max) {
+  const n = Number(value);
+  if (isNaN(n)) return min;
+  return Math.min(Math.max(n, min), max);
+}
+
+function formatCurrency(value) {
+  return "$" + value.toLocaleString("en-US", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  });
+}
+
+function calculateEstimate() {
+  const txSelect = document.getElementById("transactions");
+  const txBandIndex = txSelect.selectedIndex;
+
+  const bankAccounts = clamp(
+    document.getElementById("bank-accounts").value,
+    0,
+    20
+  );
+
+  const cardAccounts = clamp(
+    document.getElementById("card-accounts").value,
+    0,
+    30
+  );
+
+  const employees = clamp(
+    document.getElementById("employees").value,
+    0,
+    250
+  );
+
+  const monthsBehind = clamp(
+    document.getElementById("months-behind").value,
+    0,
+    36
+  );
+
+  const currentMethod = document.getElementById("current-method").value;
+
+  const totalAccounts = bankAccounts + cardAccounts;
+
+  // Allows zero defaults without making the calculator look broken.
+  const adjustedAccounts = Math.max(1, totalAccounts);
+
+  const heavyTransactions = txBandIndex >= 3; // 301–600 or 600+
+  const lowTransactions = txBandIndex <= 1;   // up to 150
+
+  let tierName = "";
+  let tierAudience = "";
+  let monthlyLow = 0;
+  let monthlyHigh = 0;
+
+  if (lowTransactions && adjustedAccounts <= 4 && employees === 0) {
+    tierName = "Starter";
+    tierAudience = "Sole props, very low volume";
+    monthlyLow = 300;
+    monthlyHigh = 450;
+  } else if (!heavyTransactions && adjustedAccounts <= 8 && employees <= 5) {
+    tierName = "Growth";
+    tierAudience = "LLCs, moderate transactions";
+    monthlyLow = 550;
+    monthlyHigh = 800;
+  } else {
+    tierName = "Full-Service";
+    tierAudience = "Multiple accounts, payroll, reporting";
+    monthlyLow = 900;
+    monthlyHigh = 1200;
   }
 
-  function formatCurrency(value) {
-    return "$" + value.toLocaleString("en-US", {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    });
+  let score = 0;
+
+  // Transactions
+  if (txBandIndex === 0) score += 0;
+  if (txBandIndex === 1) score += 12;
+  if (txBandIndex === 2) score += 35;
+  if (txBandIndex === 3) score += 70;
+  if (txBandIndex === 4) score += 100;
+
+  // Accounts
+  if (adjustedAccounts === 1) score += 0;
+  if (adjustedAccounts >= 2 && adjustedAccounts <= 4) score += 10;
+  if (adjustedAccounts >= 5 && adjustedAccounts <= 8) score += 25;
+  if (adjustedAccounts >= 9) score += 45;
+
+  // Employees
+  if (employees >= 1 && employees <= 2) score += 15;
+  if (employees >= 3 && employees <= 5) score += 30;
+  if (employees >= 6) score += 50;
+
+  // Current method
+  if (currentMethod === "none") score += 10;
+  if (currentMethod === "in-house") score += 5;
+
+  score = Math.min(score, 100);
+
+  const recommendedMonthly = Math.round(
+    monthlyLow + ((monthlyHigh - monthlyLow) * score / 100)
+  );
+
+  document.getElementById("estimate-range").textContent =
+    formatCurrency(monthlyLow) + " – " + formatCurrency(monthlyHigh) + "/mo";
+
+  document.getElementById("base-amount").textContent = tierName;
+  document.getElementById("tx-amount").textContent = tierAudience;
+  document.getElementById("account-amount").textContent =
+    formatCurrency(recommendedMonthly) + "/mo";
+  document.getElementById("payroll-amount").textContent =
+    formatCurrency(monthlyLow) + " – " + formatCurrency(monthlyHigh) + "/mo";
+
+  const captionEl = document.getElementById("estimate-caption");
+  let caption = tierName + " package estimate for a small Oregon-based business.";
+
+  if (currentMethod === "self") {
+    caption =
+      "Approximate monthly investment to move bookkeeping off your plate and into a reliable ongoing system.";
+  } else if (currentMethod === "none") {
+    caption =
+      "Good starting point if bookkeeping has not really been maintained and you need to get things under control.";
+  } else if (currentMethod === "other-bookkeeper") {
+    caption =
+      "Useful if you’re comparing your current bookkeeping arrangement against a more structured Oregon-based service.";
+  } else if (currentMethod === "in-house") {
+    caption =
+      "Rough comparison point if you’re considering outsourcing work that is currently handled internally.";
   }
 
-  function calculateEstimate() {
-    const txSelect = document.getElementById("transactions");
-    const txBandIndex = txSelect.selectedIndex;
+  captionEl.textContent = caption;
 
-    const bankAccounts = clamp(
-      document.getElementById("bank-accounts").value,
-      0,
-      20
-    );
+  const cleanupText = document.getElementById("cleanup-text");
 
-    const cardAccounts = clamp(
-      document.getElementById("card-accounts").value,
-      0,
-      30
-    );
+  if (monthsBehind <= 0) {
+    cleanupText.textContent =
+      "You’re current on your books, so no separate cleanup project is assumed.";
+    return;
+  }
 
-    const employees = clamp(
-      document.getElementById("employees").value,
-      0,
-      250
-    );
+  const cleanupLow = Math.round(monthlyLow * 0.75 * monthsBehind);
+  const cleanupHigh = Math.round(monthlyHigh * 1.1 * monthsBehind);
 
-    const monthsBehind = clamp(
-      document.getElementById("months-behind").value,
-      0,
-      36
-    );
+  cleanupText.textContent =
+    "Based on your inputs, a one-time catch-up project for about " +
+    monthsBehind +
+    (monthsBehind === 1 ? " month " : " months ") +
+    "behind could reasonably land in the range of " +
+    formatCurrency(cleanupLow) +
+    " – " +
+    formatCurrency(cleanupHigh) +
+    ". Actual pricing would depend on record quality, account cleanup needs, payroll complexity, and how much correction work is involved.";
+}
 
-    const currentMethod = document.getElementById("current-method").value;
+["transactions", "bank-accounts", "card-accounts", "employees", "months-behind"].forEach(
+  (id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("input", calculateEstimate);
+      el.addEventListener("change", calculateEstimate);
+    }
+  }
+);
 
-    const totalAccounts = bankAccounts + cardAccounts;
-    const hasPayroll = employees > 0;
-    const heavyTransactions = txBandIndex >= 3;      // 301-600 or 600+
-    const moderateTransactions = txBandIndex === 2;  // 151-300
-    const lowTransactions = txBandIndex <= 1;        // up to 150
+const currentMethodEl = document.getElementById("current-method");
+if (currentMethodEl) {
+  currentMethodEl.addEventListener("change", calculateEstimate);
+}
 
-    let tierName = "";
-    let tierAudience = "";
-    let monthlyLow = 0;
-    let monthlyHigh = 0;
-
-    // Tier assignment
-    if (lowTransactions && totalAccounts <= 4 && !hasPayroll) {
-      tierName = "Starter";
-      tierAudience = "Sole props, very low volume";
-      monthlyLow = 300;
-      monthlyHigh = 450;
-    } else if (!heavyTransactions && totalAccounts <= 8 && employees <= 5) {
-      tierName = "Growth";
-      tierAudience = "LLCs, moderate transactions";
-      monthlyLow = 550;
+calculateEstimate();      monthlyLow = 550;
       monthlyHigh = 800;
     } else {
       tierName = "Full-Service";
